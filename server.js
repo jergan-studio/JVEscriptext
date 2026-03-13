@@ -1,10 +1,18 @@
 const express = require("express")
-const {exec} = require("child_process")
+const { exec } = require("child_process")
+const path = require("path")
 
 const app = express()
 
 app.use(express.json())
-app.use(express.static("public"))
+
+// serve website
+app.use(express.static(path.join(__dirname,"public")))
+
+// homepage
+app.get("/", (req,res)=>{
+res.sendFile(path.join(__dirname,"public","index.html"))
+})
 
 app.post("/deploy",(req,res)=>{
 
@@ -14,6 +22,10 @@ exec(`git clone ${repo} project`,()=>{
 
 exec(`node interpreter.js project/main.bJVE`,
 (err,stdout)=>{
+
+if(err){
+return res.send("Error running JVE script")
+}
 
 res.send(stdout)
 
