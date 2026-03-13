@@ -1,26 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>JVEscriptext</title>
+<title>JVEscriptext - JVE Site Editor</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-<h1>JVEscriptext</h1>
-<p>Upload a ZIP folder containing .bJVE scripts and optional df.html</p>
-<input type="file" id="folderZip">
-<button onclick="upload()">Upload & Deploy</button>
-<div id="output" style="white-space: pre-wrap;"></div>
+<h1>JVEscriptext - JVE Site Editor</h1>
 
-<script>
-async function upload(){
-    const fileInput = document.getElementById("folderZip")
-    if(fileInput.files.length === 0) return alert("Select a ZIP folder")
-    const formData = new FormData()
-    formData.append("folderZip", fileInput.files[0])
-    const res = await fetch("/upload", {method:"POST", body: formData})
-    const text = await res.text()
-    document.getElementById("output").innerHTML = text
-}
-</script>
+<div class="editor-container">
+    <div class="editor-section">
+        <h2>.bJVE Scripts</h2>
+        <textarea id="bJVECode" placeholder='print "Hello World"'></textarea>
+        <button onclick="addScript()">Add Script</button>
+        <ul id="scriptList"></ul>
+    </div>
+
+    <div class="editor-section">
+        <h2>df.html Editor</h2>
+        <textarea id="htmlCode" placeholder='<h1>My DF Client</h1>'></textarea>
+        <button onclick="previewHTML()">Preview Client</button>
+        <iframe id="htmlPreview"></iframe>
+    </div>
+</div>
+
+<h2>Console Output</h2>
+<div id="consoleOutput"></div>
+
+<div class="buttons">
+    <button onclick="runScripts()">Run Scripts</button>
+    <button onclick="downloadProject()">Download Project (.zip)</button>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
