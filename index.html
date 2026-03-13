@@ -16,18 +16,30 @@
 
 <main class="container">
   <div class="deploy-section">
-    <h2>Deploy Your Project</h2>
-    <label>Deployment Key:</label>
+    <h2>Deployment Key</h2>
     <input type="text" id="deployKey" placeholder="Enter your key">
     <br><br>
-    <label>Project Folder Name:</label>
-    <input type="text" id="folderName" placeholder="Example: jve-test-repo">
-    <br><br>
-    <button onclick="deployProject()">Deploy</button>
-    <div id="deployStatus"></div>
+
+    <h2>Available Repos</h2>
+    <ul id="repoList"></ul>
   </div>
 </main>
 
 <script src="script.js"></script>
+<script>
+  // Example list of repos
+  const repos = ["jve-test-repo", "my-3d-obby", "mini-game"];
+  
+  const repoList = document.getElementById("repoList");
+  repos.forEach(repo => {
+    const li = document.createElement("li");
+    li.textContent = repo + " ";
+    const btn = document.createElement("button");
+    btn.textContent = "Deploy";
+    btn.onclick = () => deployRepo(repo);
+    li.appendChild(btn);
+    repoList.appendChild(li);
+  });
+</script>
 </body>
 </html>
