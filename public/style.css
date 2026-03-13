@@ -1,76 +1,95 @@
-let scripts = [];
+body {
 
-// Add a script to the project
-function addScript() {
-    const code = document.getElementById("bJVECode").value.trim();
-    if(!code) return alert("Write some code first!");
-    const scriptName = `script${scripts.length + 1}.bJVE`;
-    scripts.push({name: scriptName, content: code});
+font-family: Arial;
 
-    const li = document.createElement("li");
-    li.textContent = scriptName;
-    document.getElementById("scriptList").appendChild(li);
+background:#1e1e2f;
 
-    document.getElementById("bJVECode").value = "";
+color:white;
+
+text-align:center;
+
+padding:20px;
+
 }
 
-// Preview df.html client
-function previewHTML() {
-    const htmlContent = document.getElementById("htmlCode").value;
-    const iframe = document.getElementById("htmlPreview");
-    iframe.srcdoc = htmlContent;
+.editor-container{
+
+display:flex;
+
+justify-content:space-around;
+
+flex-wrap:wrap;
+
 }
 
-// Run scripts in simulated console
-function runScripts() {
-    const consoleDiv = document.getElementById("consoleOutput");
-    consoleDiv.textContent = "";
+.editor-section{
 
-    scripts.forEach(script => {
-        const lines = script.content.split("\n");
-        lines.forEach(lineRaw => {
-            const line = lineRaw.trim();
+width:45%;
 
-            if(line.startsWith("print")) {
-                const msg = line.replace("print ","").replace(/"/g,"");
-                consoleDiv.textContent += msg + "\n";
-            }
-
-            if(line.startsWith("lua.wait")) {
-                const t = parseInt(line.split(" ")[1] || 1);
-                consoleDiv.textContent += `[Wait ${t}s simulated]\n`;
-            }
-
-            if(line.startsWith("js.run")) {
-                const js = line.split(" ").slice(1).join(" ").replace(/"/g,"");
-                consoleDiv.textContent += `[JS: ${js}]\n`;
-            }
-
-            if(line.startsWith("server.get")) {
-                const url = line.split(" ")[1].replace(/"/g,"");
-                consoleDiv.textContent += `[Fetch simulated: ${url}]\n`;
-            }
-        });
-    });
 }
 
-// Download project as ZIP
-function downloadProject() {
-    if(scripts.length === 0) return alert("Add at least one .bJVE script!");
+textarea{
 
-    const zip = new JSZip();
+width:100%;
 
-    // Add scripts
-    scripts.forEach(s => zip.file(s.name, s.content));
+height:200px;
 
-    // Add df.html
-    zip.file("df.html", document.getElementById("htmlCode").value || "<h1>DF Client</h1>");
+background:#2e2e3f;
 
-    // Generate ZIP
-    zip.generateAsync({type:"blob"}).then(content => {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(content);
-        link.download = "jve-project.zip";
-        link.click();
-    });
+color:white;
+
+border:none;
+
+border-radius:5px;
+
+padding:10px;
+
+font-family:monospace;
+
+}
+
+button{
+
+padding:10px;
+
+margin:5px;
+
+border:none;
+
+border-radius:5px;
+
+background:#4CAF50;
+
+color:white;
+
+cursor:pointer;
+
+}
+
+iframe{
+
+width:100%;
+
+height:200px;
+
+border:none;
+
+background:white;
+
+}
+
+#consoleOutput{
+
+background:#2e2e3f;
+
+padding:10px;
+
+border-radius:5px;
+
+min-height:100px;
+
+white-space:pre-wrap;
+
+text-align:left;
+
 }
