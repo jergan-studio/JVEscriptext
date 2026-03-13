@@ -1,11 +1,11 @@
 {
-"name":"jvescriptext",
-"version":"1.0.0",
-"main":"server.js",
-"scripts":{
-"start":"node server.js"
-},
-"dependencies":{
-"express":"^4.18.2"
-}
+ "name": "jvescriptext",
+ "main": "server.js",
+ "scripts": {
+  "start": "node server.js"
+ },
+ "dependencies": {
+  "express": "^4.18.2",
+  "glob": "^10.3.10"
+ }
 }
