@@ -19,7 +19,7 @@ button{
     cursor: pointer;
 }
 
-pre{
+div#output{
     text-align: left;
     background: #2e2e3f;
     padding: 15px;
