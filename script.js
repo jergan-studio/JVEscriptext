@@ -1,32 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JVEscriptext Client</title>
-<link rel="icon" href="icon.ico" type="image/x-icon">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+const DEPLOY_KEY = "test123"; // Deployment key
 
-<header>
-  <img src="icon.ico" alt="JVE Logo" class="logo">
-  <h1>JVEscriptext Interactive Client</h1>
-</header>
+function deployRepo(folder){
+  const key = document.getElementById("deployKey").value;
+  const status = document.getElementById("deployStatus") || document.createElement("div");
+  if(!document.getElementById("deployStatus")) {
+    document.querySelector(".deploy-section").appendChild(status);
+    status.id = "deployStatus";
+  }
 
-<main class="container">
-  <div class="client-section">
-    <h2>Preview Deployed Site</h2>
-    <label>Deployed Folder Name:</label>
-    <input type="text" id="folderName" placeholder="Example: jve-test-repo">
-    <button onclick="loadClient()">Load</button>
-    <br><br>
-    <iframe id="clientPreview" src="" width="800" height="500"></iframe>
-    <h3>JVE Console:</h3>
-    <div id="clientConsole" class="console"></div>
-  </div>
-</main>
+  if(key !== DEPLOY_KEY){
+    status.textContent = "❌ Invalid deployment key!";
+    return;
+  }
 
-<script src="script.js"></script>
-</body>
-</html>
+  status.textContent = `🚀 Deploying ${folder}...`;
+
+  setTimeout(()=>{
+    status.textContent = `✅ Deployment complete! Visit c.html and load folder: ${folder}`;
+  },1500);
+}
