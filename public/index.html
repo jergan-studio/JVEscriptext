@@ -5,18 +5,16 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <h1>JVEscriptext</h1>
 <p>Enter GitHub Repo URL to deploy:</p>
-
 <input id="repo" placeholder="GitHub Repo URL">
 <button onclick="deploy()">Deploy</button>
-
 <pre id="output"></pre>
 
 <script>
 async function deploy(){
     const repo = document.getElementById("repo").value
+    if(!repo) return alert("Enter a repo URL")
     const res = await fetch("/deploy",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -26,6 +24,5 @@ async function deploy(){
     document.getElementById("output").textContent = text
 }
 </script>
-
 </body>
 </html>
