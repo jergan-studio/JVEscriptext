@@ -1,34 +1,48 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<title>JVEscriptext</title>
-
+<title>JVEscriptext IDE</title>
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-<h1>JVEscriptext Editor</h1>
+<header>
+<h1>JVEscriptext IDE</h1>
+<button onclick="runProject()">Run</button>
+</header>
 
-<textarea id="code">
+<div class="container">
 
-var player = "Joseph"
+<div class="files">
+<h3>Files</h3>
 
-event start {
-    print "Game Started"
-}
+<ul id="fileList"></ul>
 
-</textarea>
+<button onclick="addFile()">New File</button>
+</div>
 
-<br><br>
+<div class="editor">
 
-<button onclick="runJVE()">Run</button>
+<div id="tabs"></div>
 
-<h2>Console</h2>
+<textarea id="code"></textarea>
+
+</div>
+
+<div class="preview">
+
+<h3>Preview</h3>
+
+<iframe id="preview"></iframe>
+
+<h3>Console</h3>
 
 <div id="console"></div>
+
+</div>
+
+</div>
 
 <script src="script.js"></script>
 
