@@ -1,76 +1,66 @@
-let scripts = [];
+let scripts = []
+let currentProject = ""
 
-// Add a script to the project
-function addScript() {
-    const code = document.getElementById("bJVECode").value.trim();
-    if(!code) return alert("Write some code first!");
-    const scriptName = `script${scripts.length + 1}.bJVE`;
-    scripts.push({name: scriptName, content: code});
+// Save project
+function saveProject(){
+    const name = prompt("Project name:")
+    if(!name) return
 
-    const li = document.createElement("li");
-    li.textContent = scriptName;
-    document.getElementById("scriptList").appendChild(li);
+    const project = {
+        scripts: scripts,
+        html: document.getElementById("htmlCode").value
+    }
 
-    document.getElementById("bJVECode").value = "";
+    localStorage.setItem("jve_project_"+name, JSON.stringify(project))
+    loadProjects()
 }
 
-// Preview df.html client
-function previewHTML() {
-    const htmlContent = document.getElementById("htmlCode").value;
-    const iframe = document.getElementById("htmlPreview");
-    iframe.srcdoc = htmlContent;
+// Load project list
+function loadProjects(){
+    const list = document.getElementById("projectList")
+    list.innerHTML = ""
+
+    Object.keys(localStorage).forEach(key=>{
+        if(key.startsWith("jve_project_")){
+            const name = key.replace("jve_project_","")
+
+            const li = document.createElement("li")
+
+            const loadBtn = document.createElement("button")
+            loadBtn.textContent = "Load " + name
+            loadBtn.onclick = ()=>loadProject(name)
+
+            const delBtn = document.createElement("button")
+            delBtn.textContent = "Delete"
+            delBtn.onclick = ()=>{
+                localStorage.removeItem(key)
+                loadProjects()
+            }
+
+            li.appendChild(loadBtn)
+            li.appendChild(delBtn)
+
+            list.appendChild(li)
+        }
+    })
 }
 
-// Run scripts in simulated console
-function runScripts() {
-    const consoleDiv = document.getElementById("consoleOutput");
-    consoleDiv.textContent = "";
+// Load a project
+function loadProject(name){
+    const data = JSON.parse(localStorage.getItem("jve_project_"+name))
 
-    scripts.forEach(script => {
-        const lines = script.content.split("\n");
-        lines.forEach(lineRaw => {
-            const line = lineRaw.trim();
+    scripts = data.scripts
+    document.getElementById("htmlCode").value = data.html
 
-            if(line.startsWith("print")) {
-                const msg = line.replace("print ","").replace(/"/g,"");
-                consoleDiv.textContent += msg + "\n";
-            }
+    const list = document.getElementById("scriptList")
+    list.innerHTML = ""
 
-            if(line.startsWith("lua.wait")) {
-                const t = parseInt(line.split(" ")[1] || 1);
-                consoleDiv.textContent += `[Wait ${t}s simulated]\n`;
-            }
-
-            if(line.startsWith("js.run")) {
-                const js = line.split(" ").slice(1).join(" ").replace(/"/g,"");
-                consoleDiv.textContent += `[JS: ${js}]\n`;
-            }
-
-            if(line.startsWith("server.get")) {
-                const url = line.split(" ")[1].replace(/"/g,"");
-                consoleDiv.textContent += `[Fetch simulated: ${url}]\n`;
-            }
-        });
-    });
+    scripts.forEach(s=>{
+        const li = document.createElement("li")
+        li.textContent = s.name
+        list.appendChild(li)
+    })
 }
 
-// Download project as ZIP
-function downloadProject() {
-    if(scripts.length === 0) return alert("Add at least one .bJVE script!");
-
-    const zip = new JSZip();
-
-    // Add scripts
-    scripts.forEach(s => zip.file(s.name, s.content));
-
-    // Add df.html
-    zip.file("df.html", document.getElementById("htmlCode").value || "<h1>DF Client</h1>");
-
-    // Generate ZIP
-    zip.generateAsync({type:"blob"}).then(content => {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(content);
-        link.download = "jve-project.zip";
-        link.click();
-    });
-}
+// Run on page load
+window.onload = loadProjects
