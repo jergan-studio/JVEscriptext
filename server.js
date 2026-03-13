@@ -1,79 +1,61 @@
 const express = require("express")
-const { exec } = require("child_process")
-const path = require("path")
+const fileUpload = require("express-fileupload")
 const fs = require("fs")
+const path = require("path")
 const glob = require("glob")
+const { exec } = require("child_process")
 
 const app = express()
-app.use(express.json())
 app.use(express.static("public"))
+app.use(fileUpload())
 
-// Main page
-app.get("/", (req,res)=>{
-    res.sendFile(path.join(__dirname,"public","index.html"))
-})
-
-// Run all .bJVE scripts in a folder
-function runAllScripts(deployPath){
-    return new Promise((resolve, reject)=>{
-        glob(`${deployPath}/**/*.bJVE`, (err, files)=>{
+// Run .bJVE scripts
+function runAllScripts(folder){
+    return new Promise((resolve,reject)=>{
+        glob(`${folder}/**/*.bJVE`, (err, files)=>{
             if(err) return reject(err)
-            if(files.length === 0) return reject("No .bJVE files found!")
-
-            let outputs = []
+            if(files.length===0) return reject("No .bJVE files found!")
+            let outputs=[]
             let tasks = files.map(file=>{
                 return new Promise(res=>{
                     exec(`node interpreter.js "${file}"`, (err, stdout, stderr)=>{
-                        if(err){
-                            outputs.push(`Error running script ${file}:\n${stderr}`)
-                        } else {
-                            outputs.push(stdout)
-                        }
+                        if(err) outputs.push(`Error in ${file}:\n${stderr}`)
+                        else outputs.push(stdout)
                         res()
                     })
                 })
             })
-
             Promise.all(tasks).then(()=>resolve(outputs.join("\n")))
         })
     })
 }
 
-// Deploy endpoint
-app.post("/deploy", async (req,res)=>{
-    const repo = req.body.repo
-    if(!repo) return res.send("No repo URL provided")
-    const repoName = repo.split("/").pop().replace(".git","")
-    const deployPath = path.join(__dirname,"deployed_repos",repoName)
+// Upload endpoint
+app.post("/upload", async (req,res)=>{
+    if(!req.files || !req.files.folderZip) return res.send("No folder uploaded")
+    const folderZip = req.files.folderZip
+    const uploadPath = path.join(__dirname,"uploads",folderZip.name.replace(".zip",""))
 
-    // Remove old folder if exists
-    if(fs.existsSync(deployPath)){
-        fs.rmSync(deployPath,{recursive:true,force:true})
-    }
+    // Make folder
+    fs.mkdirSync(uploadPath, {recursive:true})
 
-    // Git clone with error logging
-    exec(`git clone ${repo} "${deployPath}"`, async (err, stdout, stderr)=>{
-        if(err){
-            console.error("Git clone error:", stderr)
-            return res.send("Git clone failed:\n"+stderr)
-        }
-        console.log("Git clone output:", stdout)
+    // Save uploaded zip temporarily
+    const tempZipPath = path.join(__dirname,"uploads",folderZip.name)
+    await folderZip.mv(tempZipPath)
 
+    // Unzip
+    const unzipper = require("unzipper")
+    fs.createReadStream(tempZipPath).pipe(unzipper.Extract({path: uploadPath})).on("close", async ()=>{
+        fs.unlinkSync(tempZipPath) // remove zip
         try{
-            const output = await runAllScripts(deployPath)
-            let responseText = output + "\n"
-
-            // check for index.html or df.html in the repo
-            let clientPath = path.join(deployPath,"index.html")
-            if(!fs.existsSync(clientPath)){
-                clientPath = path.join(deployPath,"df.html")
-            }
-
+            const output = await runAllScripts(uploadPath)
+            let clientPath = path.join(uploadPath,"index.html")
+            if(!fs.existsSync(clientPath)) clientPath = path.join(uploadPath,"df.html")
+            let htmlOutput = output + "\n"
             if(fs.existsSync(clientPath)){
-                responseText += `Play client here: /play/${repoName}`
+                htmlOutput += `<br><a href="/play/${folderZip.name.replace(".zip","")}" target="_blank">Open Client</a>`
             }
-
-            res.send(responseText)
+            res.send(htmlOutput)
         }catch(e){
             res.send("Error running scripts: "+e)
         }
@@ -81,20 +63,12 @@ app.post("/deploy", async (req,res)=>{
 })
 
 // Serve client pages
-app.get("/play/:repo", (req,res)=>{
-    const deployPath = path.join(__dirname,"deployed_repos",req.params.repo)
-    let clientPath = path.join(deployPath,"index.html")
-    if(!fs.existsSync(clientPath)){
-        clientPath = path.join(deployPath,"df.html")
-    }
-
-    if(fs.existsSync(clientPath)){
-        res.sendFile(clientPath)
-    } else {
-        res.send("Client page not found")
-    }
+app.get("/play/:folder", (req,res)=>{
+    const folderPath = path.join(__dirname,"uploads",req.params.folder)
+    let clientPath = path.join(folderPath,"index.html")
+    if(!fs.existsSync(clientPath)) clientPath = path.join(folderPath,"df.html")
+    if(fs.existsSync(clientPath)) res.sendFile(clientPath)
+    else res.send("Client page not found")
 })
 
-app.listen(3000, ()=>{
-    console.log("JVEscriptext running on port 3000")
-})
+app.listen(3000, ()=>console.log("JVEscriptext running"))
