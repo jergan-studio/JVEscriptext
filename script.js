@@ -1,18 +1,24 @@
+const DEPLOY_KEY = "test123"; // Change for testing
+
 function deployProject(){
   const key = document.getElementById("deployKey").value;
   const folder = document.getElementById("folderName").value;
   const status = document.getElementById("deployStatus");
 
-  if(!key || !folder){
-    status.textContent = "Please enter deployment key and folder name!";
+  if(key !== DEPLOY_KEY){
+    status.textContent = "❌ Invalid deployment key!";
     return;
   }
 
-  // Simulate deployment (replace with actual API call)
-  status.textContent = "Deploying " + folder + "...";
+  if(!folder){
+    status.textContent = "❌ Enter a folder name!";
+    return;
+  }
+
+  status.textContent = "🚀 Deploying " + folder + "...";
 
   setTimeout(()=>{
-    status.textContent = "✅ Deployment complete! Visit c.html?folder=" + folder;
+    status.textContent = "✅ Deployment complete! Visit c.html and load folder: " + folder;
   },1500);
 }
 
@@ -26,7 +32,6 @@ function loadClient(){
     return;
   }
 
-  // Load the deployed index.html from folder
   iframe.src = folder + "/index.html";
   consoleDiv.textContent = "Loaded " + folder;
 }
