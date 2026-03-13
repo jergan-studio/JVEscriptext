@@ -1,102 +1,39 @@
-const express = require("express")
-const { exec } = require("child_process")
-const path = require("path")
 const fs = require("fs")
-const glob = require("glob")
+const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args))
 
-const app = express()
-app.use(express.json())
-app.use(express.static("public"))
+async function runJVE(file){
+    const code = fs.readFileSync(file,"utf8")
+    const lines = code.split("\n")
 
-// Main page
-app.get("/", (req,res)=>{
-    res.sendFile(path.join(__dirname,"public","index.html"))
-})
+    for(const lineRaw of lines){
+        const line = lineRaw.trim()
+        if(line.startsWith("print")){
+            const msg = line.replace("print ","").replace(/"/g,"")
+            console.log(msg)
+        }
 
-// Run all .bJVE scripts in a folder
-function runAllScripts(deployPath){
-    return new Promise((resolve, reject)=>{
-        glob(`${deployPath}/**/*.bJVE`, (err, files)=>{
-            if(err) return reject(err)
-            if(files.length === 0) return reject("No .bJVE files found!")
+        if(line.startsWith("lua.wait")){
+            const t = parseInt(line.split(" ")[1] || 1)
+            await new Promise(r=>setTimeout(r, t*1000))
+        }
 
-            let outputs = []
-            let tasks = files.map(file=>{
-                return new Promise(res=>{
-                    exec(`node interpreter.js "${file}"`, (err, stdout, stderr)=>{
-                        if(err){
-                            outputs.push(`Error running script ${file}:\n${stderr}`)
-                        } else {
-                            outputs.push(stdout)
-                        }
-                        res()
-                    })
-                })
-            })
+        if(line.startsWith("server.get")){
+            const url = line.split(" ")[1].replace(/"/g,"")
+            try{
+                const res = await fetch(url)
+                const text = await res.text()
+                console.log(text)
+            }catch(e){
+                console.log("Error fetching", url)
+            }
+        }
 
-            Promise.all(tasks).then(()=>resolve(outputs.join("\n")))
-        })
-    })
+        if(line.startsWith("js.run")){
+            const js = line.split(" ").slice(1).join(" ").replace(/"/g,"")
+            console.log("JS to run:", js)
+        }
+    }
 }
 
-// Deploy endpoint
-app.post("/deploy", async (req,res)=>{
-    const repo = req.body.repo
-    if(!repo) return res.send("No repo URL provided")
-    const repoName = repo.split("/").pop().replace(".git","")
-    const deployPath = path.join(__dirname,"deployed_repos",repoName)
-
-    // Remove old folder if exists
-    if(fs.existsSync(deployPath)){
-        fs.rmSync(deployPath,{recursive:true,force:true})
-    }
-
-    // Git clone with error logging
-    exec(`git clone ${repo} "${deployPath}"`, async (err, stdout, stderr)=>{
-        if(err){
-            console.error("Git clone error:", stderr)
-            return res.send("Git clone failed:\n"+stderr)
-        }
-        console.log("Git clone output:", stdout)
-
-        try{
-            const output = await runAllScripts(deployPath)
-            let responseText = output + "\n"
-
-            // Determine which client to use
-            let clientPath = path.join(deployPath,"index.html")
-            let clientFile = "index.html"
-            if(!fs.existsSync(clientPath)){
-                clientPath = path.join(deployPath,"df.html")
-                clientFile = "df.html"
-            }
-
-            if(fs.existsSync(clientPath)){
-                responseText += `<br><button onclick="window.open('/play/${repoName}', '_blank')">Open Client (${clientFile})</button>`
-            }
-
-            res.send(responseText)
-        }catch(e){
-            res.send("Error running scripts: "+e)
-        }
-    })
-})
-
-// Serve client pages
-app.get("/play/:repo", (req,res)=>{
-    const deployPath = path.join(__dirname,"deployed_repos",req.params.repo)
-    let clientPath = path.join(deployPath,"index.html")
-    if(!fs.existsSync(clientPath)){
-        clientPath = path.join(deployPath,"df.html")
-    }
-
-    if(fs.existsSync(clientPath)){
-        res.sendFile(clientPath)
-    } else {
-        res.send("Client page not found")
-    }
-})
-
-app.listen(3000, ()=>{
-    console.log("JVEscriptext running on port 3000")
-})
+// Run the file from command line
+runJVE(process.argv[2])
