@@ -1,37 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>JVEscriptext - JVE Site Editor</title>
+<title>JVEscriptext Editor</title>
+
 <link rel="stylesheet" href="style.css">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 </head>
+
 <body>
-<h1>JVEscriptext - JVE Site Editor</h1>
+
+<h1>JVEscriptext Editor</h1>
+
+<h2>Projects</h2>
+
+<button onclick="saveProject()">Save Project</button>
+
+<ul id="projectList"></ul>
 
 <div class="editor-container">
-    <div class="editor-section">
-        <h2>.bJVE Scripts</h2>
-        <textarea id="bJVECode" placeholder='print "Hello World"'></textarea>
-        <button onclick="addScript()">Add Script</button>
-        <ul id="scriptList"></ul>
-    </div>
 
-    <div class="editor-section">
-        <h2>df.html Editor</h2>
-        <textarea id="htmlCode" placeholder='<h1>My DF Client</h1>'></textarea>
-        <button onclick="previewHTML()">Preview Client</button>
-        <iframe id="htmlPreview"></iframe>
-    </div>
+<div class="editor-section">
+
+<h2>.bJVE Script</h2>
+
+<textarea id="bJVECode">print "Hello World"</textarea>
+
+<button onclick="addScript()">Add Script</button>
+
+<ul id="scriptList"></ul>
+
 </div>
 
-<h2>Console Output</h2>
+<div class="editor-section">
+
+<h2>df.html</h2>
+
+<textarea id="htmlCode"><h1>My DF Client</h1></textarea>
+
+<button onclick="previewHTML()">Preview</button>
+
+<iframe id="htmlPreview"></iframe>
+
+</div>
+
+</div>
+
+<h2>Console</h2>
+
 <div id="consoleOutput"></div>
 
 <div class="buttons">
-    <button onclick="runScripts()">Run Scripts</button>
-    <button onclick="downloadProject()">Download Project (.zip)</button>
+
+<button onclick="runScripts()">Run Scripts</button>
+
+<button onclick="downloadProject()">Download Project</button>
+
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
