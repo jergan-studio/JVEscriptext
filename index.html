@@ -1,50 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>JVEscriptext IDE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JVEscriptext Documentation</title>
+
+<!-- Favicon -->
+<link rel="icon" href="https://raw.githubusercontent.com/jergan-studio/JVEscriptext/refs/heads/main/icon.ico" type="image/x-icon">
+
+<!-- Styles -->
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header>
-<h1>JVEscriptext IDE</h1>
-<button onclick="runProject()">Run</button>
+  <img src="https://raw.githubusercontent.com/jergan-studio/JVEscriptext/refs/heads/main/icon.ico" alt="JVE Logo" class="logo">
+  <h1>JVEscriptext Docs</h1>
 </header>
 
 <div class="container">
+  <aside class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#variables">Variables</a></li>
+      <li><a href="#functions">Functions</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#html-commands">HTML Commands</a></li>
+      <li><a href="#js-commands">JavaScript Commands</a></li>
+    </ul>
+  </aside>
 
-<div class="files">
-<h3>Files</h3>
+  <main class="content">
+    <section id="getting-started">
+      <h2>Getting Started</h2>
+      <p>JVEscriptext is a scripting language designed to work with HTML, CSS, and JavaScript in a browser environment. You can use it to control the DOM, run JS functions, and manage game logic or interactive web apps.</p>
+    </section>
 
-<ul id="fileList"></ul>
+    <section id="variables">
+      <h2>Variables</h2>
+      <pre><code>var player = "Joseph"
+var score = 10</code></pre>
+      <p>Use variables to store values. Strings should be wrapped in quotes.</p>
+    </section>
 
-<button onclick="addFile()">New File</button>
+    <section id="functions">
+      <h2>Functions</h2>
+      <pre><code>function greet() {
+  print "Hello " + player
+}
+
+greet()</code></pre>
+      <p>Functions let you reuse code and run multiple commands together.</p>
+    </section>
+
+    <section id="events">
+      <h2>Events</h2>
+      <pre><code>event start {
+  print "Game started!"
+}
+
+event click {
+  print "Button clicked!"
+}</code></pre>
+      <p>Events allow JVE to respond to triggers like page load or user actions.</p>
+    </section>
+
+    <section id="html-commands">
+      <h2>HTML Commands</h2>
+      <pre><code>html.text "title" "Hello Player"
+html.style "title" "color:red"
+html.create "button" "myBtn"
+html.append "myBtn" "body"</code></pre>
+      <p>Control HTML elements: change text, style, or create new elements.</p>
+    </section>
+
+    <section id="js-commands">
+      <h2>JavaScript Commands</h2>
+      <pre><code>js.call "sayHello"</code></pre>
+      <p>Call JavaScript functions directly from JVE scripts.</p>
+    </section>
+  </main>
 </div>
-
-<div class="editor">
-
-<div id="tabs"></div>
-
-<textarea id="code"></textarea>
-
-</div>
-
-<div class="preview">
-
-<h3>Preview</h3>
-
-<iframe id="preview"></iframe>
-
-<h3>Console</h3>
-
-<div id="console"></div>
-
-</div>
-
-</div>
-
-<script src="script.js"></script>
 
 </body>
 </html>
