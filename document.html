@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JVEscriptext Documentation</title>
+<link rel="icon" href="icon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <img src="icon.ico" alt="JVE Logo" class="logo">
+  <h1>JVEscriptext Docs</h1>
+</header>
+
+<div class="container">
+  <aside class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#variables">Variables</a></li>
+      <li><a href="#functions">Functions</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#html-commands">HTML Commands</a></li>
+      <li><a href="#js-commands">JavaScript Commands</a></li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    <section id="getting-started">
+      <h2>Getting Started</h2>
+      <p>JVEscriptext is a scripting language for HTML, CSS, and JS. Use it to control web apps and game logic.</p>
+    </section>
+
+    <section id="variables">
+      <h2>Variables</h2>
+      <pre><code>var player = "Joseph"
+var score = 10</code></pre>
+    </section>
+
+    <section id="functions">
+      <h2>Functions</h2>
+      <pre><code>function greet() {
+print "Hello " + player
+}
+
+greet()</code></pre>
+    </section>
+
+    <section id="events">
+      <h2>Events</h2>
+      <pre><code>event start {
+print "Game started!"
+}
+
+event click {
+print "Button clicked!"
+}</code></pre>
+    </section>
+
+    <section id="html-commands">
+      <h2>HTML Commands</h2>
+      <pre><code>html.text "title" "Hello Player"
+html.style "title" "color:red"
+html.create "button" "myBtn"
+html.append "myBtn" "body"</code></pre>
+    </section>
+
+    <section id="js-commands">
+      <h2>JavaScript Commands</h2>
+      <pre><code>js.call "sayHello"</code></pre>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>
