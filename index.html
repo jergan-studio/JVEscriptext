@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>JVEscriptext</title>
+</head>
+
+<body>
+
+<h1>Deploy JVE Repo</h1>
+
+<input id="repo" placeholder="GitHub Repo URL">
+
+<button onclick="deploy()">Deploy</button>
+
+<pre id="output"></pre>
+
+<script>
+
+async function deploy(){
+
+const repo=document.getElementById("repo").value
+
+const res=await fetch("/deploy",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({repo})
+})
+
+const text=await res.text()
+
+document.getElementById("output").textContent=text
+
+}
+
+</script>
+
+</body>
+
+</html>
