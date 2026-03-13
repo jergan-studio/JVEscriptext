@@ -6,20 +6,18 @@
 </head>
 <body>
 <h1>JVEscriptext</h1>
-<p>Enter GitHub Repo URL to deploy:</p>
-<input id="repo" placeholder="GitHub Repo URL">
-<button onclick="deploy()">Deploy</button>
+<p>Upload a ZIP folder containing .bJVE scripts and optional df.html</p>
+<input type="file" id="folderZip">
+<button onclick="upload()">Upload & Deploy</button>
 <div id="output" style="white-space: pre-wrap;"></div>
 
 <script>
-async function deploy(){
-    const repo = document.getElementById("repo").value
-    if(!repo) return alert("Enter GitHub repo URL")
-    const res = await fetch("/deploy",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({repo})
-    })
+async function upload(){
+    const fileInput = document.getElementById("folderZip")
+    if(fileInput.files.length === 0) return alert("Select a ZIP folder")
+    const formData = new FormData()
+    formData.append("folderZip", fileInput.files[0])
+    const res = await fetch("/upload", {method:"POST", body: formData})
     const text = await res.text()
     document.getElementById("output").innerHTML = text
 }
