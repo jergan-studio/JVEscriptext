@@ -1,14 +1,62 @@
-function runSite(){
+const files = {
+"index.html":"<h1 id='title'>Hello</h1>\n<button onclick='hello()'>Click</button>",
+"style.css":"body{font-family:Arial;text-align:center;}",
+"script.js":"function hello(){alert('Hello from JS')}",
+"main.jve":"var player = \"Joseph\"\nprint \"Hello \" + player\nhtml.text \"title\" \"Hello Joseph\""
+}
 
-const html=document.getElementById("htmlCode").value
-const css=document.getElementById("cssCode").value
-const js=document.getElementById("jsCode").value
-const jve=document.getElementById("jveCode").value
+let currentFile="index.html"
 
-const preview=document.getElementById("preview")
-const consoleDiv=document.getElementById("console")
+function refreshFiles(){
 
-consoleDiv.textContent=""
+const list=document.getElementById("fileList")
+list.innerHTML=""
+
+Object.keys(files).forEach(name=>{
+
+const li=document.createElement("li")
+li.textContent=name
+
+li.onclick=()=>openFile(name)
+
+list.appendChild(li)
+
+})
+
+}
+
+function openFile(name){
+
+currentFile=name
+
+document.getElementById("code").value=files[name]
+
+}
+
+document.getElementById("code").addEventListener("input",()=>{
+
+files[currentFile]=document.getElementById("code").value
+
+})
+
+function addFile(){
+
+const name=prompt("File name")
+
+if(!name)return
+
+files[name]=""
+
+refreshFiles()
+
+}
+
+function runProject(){
+
+const html=files["index.html"]||""
+const css=files["style.css"]||""
+const js=files["script.js"]||""
+const jve=files["main.jve"]||""
 
 const page=`
 
@@ -17,14 +65,12 @@ const page=`
 ${html}
 
 <script>
-
 ${js}
-
 <\/script>
 
 `
 
-preview.srcdoc=page
+document.getElementById("preview").srcdoc=page
 
 runJVE(jve)
 
@@ -34,7 +80,9 @@ function runJVE(code){
 
 const consoleDiv=document.getElementById("console")
 
-const variables={}
+consoleDiv.textContent=""
+
+const vars={}
 
 const lines=code.split("\n")
 
@@ -49,7 +97,7 @@ const parts=line.replace("var","").split("=")
 const name=parts[0].trim()
 const value=parts[1].replace(/"/g,"").trim()
 
-variables[name]=value
+vars[name]=value
 
 }
 
@@ -57,8 +105,8 @@ if(line.startsWith("print")){
 
 let msg=line.replace("print","").trim()
 
-Object.keys(variables).forEach(v=>{
-msg=msg.replace(v,variables[v])
+Object.keys(vars).forEach(v=>{
+msg=msg.replace(v,vars[v])
 })
 
 msg=msg.replace(/"/g,"")
@@ -67,44 +115,22 @@ consoleDiv.textContent+=msg+"\n"
 
 }
 
-if(line.startsWith("html.setText")){
+if(line.startsWith("html.text")){
 
 const parts=line.split('"')
 
 const id=parts[1]
 const text=parts[3]
 
-const iframe=document.getElementById("preview")
-
-iframe.contentWindow.document.getElementById(id).innerText=text
-
-}
-
-if(line.startsWith("html.setStyle")){
-
-const parts=line.split('"')
-
-const id=parts[1]
-const style=parts[3]
-
-const iframe=document.getElementById("preview")
-
-iframe.contentWindow.document.getElementById(id).style=style
-
-}
-
-if(line.startsWith("js.call")){
-
-const parts=line.split('"')
-
-const fn=parts[1]
-
-const iframe=document.getElementById("preview")
-
-iframe.contentWindow[fn]()
+document.getElementById("preview")
+.contentWindow.document
+.getElementById(id).innerText=text
 
 }
 
 }
 
 }
+
+refreshFiles()
+openFile("index.html")
