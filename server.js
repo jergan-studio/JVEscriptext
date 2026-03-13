@@ -4,17 +4,18 @@ const fs = require("fs")
 const path = require("path")
 const glob = require("glob")
 const { exec } = require("child_process")
+const unzipper = require("unzipper")
 
 const app = express()
 app.use(express.static("public"))
 app.use(fileUpload())
 
-// Run .bJVE scripts
+// Run all .bJVE scripts in a folder
 function runAllScripts(folder){
     return new Promise((resolve,reject)=>{
         glob(`${folder}/**/*.bJVE`, (err, files)=>{
             if(err) return reject(err)
-            if(files.length===0) return reject("No .bJVE files found!")
+            if(files.length===0) return reject("No .bJVE scripts found!")
             let outputs=[]
             let tasks = files.map(file=>{
                 return new Promise(res=>{
@@ -36,17 +37,12 @@ app.post("/upload", async (req,res)=>{
     const folderZip = req.files.folderZip
     const uploadPath = path.join(__dirname,"uploads",folderZip.name.replace(".zip",""))
 
-    // Make folder
     fs.mkdirSync(uploadPath, {recursive:true})
-
-    // Save uploaded zip temporarily
     const tempZipPath = path.join(__dirname,"uploads",folderZip.name)
     await folderZip.mv(tempZipPath)
 
-    // Unzip
-    const unzipper = require("unzipper")
     fs.createReadStream(tempZipPath).pipe(unzipper.Extract({path: uploadPath})).on("close", async ()=>{
-        fs.unlinkSync(tempZipPath) // remove zip
+        fs.unlinkSync(tempZipPath)
         try{
             const output = await runAllScripts(uploadPath)
             let clientPath = path.join(uploadPath,"index.html")
@@ -71,4 +67,4 @@ app.get("/play/:folder", (req,res)=>{
     else res.send("Client page not found")
 })
 
-app.listen(3000, ()=>console.log("JVEscriptext running"))
+app.listen(3000, ()=>console.log("JVEscriptext running on port 3000"))
